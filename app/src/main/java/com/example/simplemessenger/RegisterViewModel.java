@@ -1,5 +1,7 @@
 package com.example.simplemessenger;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,6 +12,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterViewModel extends ViewModel {
 
@@ -17,6 +21,8 @@ public class RegisterViewModel extends ViewModel {
     private FirebaseAuth mAuth;
     private final MutableLiveData <String> errorRegistrationLD = new MutableLiveData<>();
     private final MutableLiveData <FirebaseUser> firebaseUserLD = new MutableLiveData<>();
+    FirebaseDatabase database;
+    DatabaseReference refUsers;
 
     public RegisterViewModel() {
         mAuth = FirebaseAuth.getInstance();
@@ -28,6 +34,9 @@ public class RegisterViewModel extends ViewModel {
                 }
             }
         });
+
+        database = FirebaseDatabase.getInstance();
+        refUsers = database.getReference("Users");
     }
 
     public void registrationUser(String emailRegistration, String passwordRegistration,
@@ -37,7 +46,12 @@ public class RegisterViewModel extends ViewModel {
                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-// if registration success onAuthStateChanged (CurrentUser() != null)
+// if the registration was successful, the onAuthStateChanged method will work (CurrentUser() != null)
+                        String userId = mAuth.getCurrentUser().getUid();
+                        if (mAuth.getCurrentUser() != null) {
+                            User user = new User(userId, nameRegistration, lastNameRegistration, ageRegistration, false);
+                            refUsers.child(userId).setValue(user);
+                        }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override

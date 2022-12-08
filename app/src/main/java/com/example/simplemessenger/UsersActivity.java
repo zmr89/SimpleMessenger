@@ -12,13 +12,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class UsersActivity extends AppCompatActivity {
     private static final String TAG = "UsersActivity";
@@ -37,8 +40,6 @@ public class UsersActivity extends AppCompatActivity {
         recyclerviewUsers = findViewById(R.id.recyclerviewUsers);
         userAdapter = new UserAdapter();
         recyclerviewUsers.setAdapter(userAdapter);
-
-
     }
 
     @Override
@@ -65,6 +66,13 @@ public class UsersActivity extends AppCompatActivity {
                     Intent intent = LoginActivity.newIntent(UsersActivity.this);
                     startActivity(intent);
                     finish();
+            }
+        });
+
+        usersViewModel.getListUsersLD().observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                userAdapter.setUserList(users);
             }
         });
     }
