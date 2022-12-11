@@ -68,6 +68,14 @@ public class UsersViewModel extends ViewModel {
         });
     }
 
+    public void setOnlineStatus(Boolean isOnline) {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            return;
+        }
+        refUsers.child(currentUser.getUid()).child("onlineStatus").setValue(isOnline);
+    }
+
     public LiveData<FirebaseUser> getFirebaseUserLD() {
         return firebaseUserLD;
     }

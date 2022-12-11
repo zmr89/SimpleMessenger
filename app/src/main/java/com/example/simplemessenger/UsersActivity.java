@@ -25,6 +25,7 @@ import java.util.List;
 
 public class UsersActivity extends AppCompatActivity {
     private static final String TAG = "UsersActivity";
+    private static final String EXTRA_CURRENT_USER_ID = "currentUserId";
     private UsersViewModel usersViewModel;
     private RecyclerView recyclerviewUsers;
     private UserAdapter userAdapter;
@@ -40,6 +41,15 @@ public class UsersActivity extends AppCompatActivity {
         recyclerviewUsers = findViewById(R.id.recyclerviewUsers);
         userAdapter = new UserAdapter();
         recyclerviewUsers.setAdapter(userAdapter);
+
+        String currentUserId = getIntent().getStringExtra(EXTRA_CURRENT_USER_ID);
+        userAdapter.setOnUserClickListener(new UserAdapter.OnUserClickListener() {
+            @Override
+            public void OnUserClick(User user) {
+                Intent intent = ChatActivity.newIntent(UsersActivity.this, currentUserId, user.getId());
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -54,8 +64,9 @@ public class UsersActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static Intent newIntent(Context context) {
+    public static Intent newIntent(Context context, String currentUserId) {
         Intent intent = new Intent(context, UsersActivity.class);
+        intent.putExtra(EXTRA_CURRENT_USER_ID, currentUserId);
         return intent;
     }
 
@@ -75,6 +86,18 @@ public class UsersActivity extends AppCompatActivity {
                 userAdapter.setUserList(users);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        usersViewModel.setOnlineStatus(true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        usersViewModel.setOnlineStatus(false);
     }
 
 }
