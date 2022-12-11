@@ -44,6 +44,7 @@ public class UsersViewModel extends ViewModel {
     }
 
     public void signOut() {
+        setOnlineStatus(false);
         mAuth.signOut();
     }
 
